@@ -1,0 +1,12 @@
+<webscript>
+  <shortname>Checksum-Calculator</shortname>
+  <description>
+    Calculates the hash(es) of the contents of a given node, against
+    one or more (supported) hash algorthims
+  </description>
+  <url>/com/quanitcate/opensource/checksums/node/{store_type}/{store_id}/{id}/{path}</url>
+  <url>/com/quanitcate/opensource/checksums/noderef/{nodref}</url>
+  <authentication>user</authentication>
+  <format default="json">any</format>
+  <transaction allow="readonly">required</transaction>
+</webscript>

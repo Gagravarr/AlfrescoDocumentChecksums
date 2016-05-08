@@ -1,0 +1,11 @@
+<webscript>
+  <shortname>Checksum-Hashes</shortname>
+  <description>
+    Returns the hash algorthims available for use when calculating the
+    checksums of content
+  </description>
+  <url>/com/quanitcate/opensource/checksums/hashes</url>
+  <authentication>user</authentication>
+  <format default="json">any</format>
+  <transaction allow="readonly">required</transaction>
+</webscript>
