@@ -53,7 +53,20 @@ public class ChecksumCalculatorWebScript extends AbstractWebScript {
    public void execute(WebScriptRequest req, WebScriptResponse res) throws IOException
    {
       // Work out what Node they want
-      // TODO
+      NodeRef node;
+      Map<String,String> args = req.getServiceMatch().getTemplateVars();
+      if(args.get("store_type") != null)
+      {
+         node = new NodeRef(
+               args.get("store_type"),
+               args.get("store_id"),
+               args.get("id")
+         );
+      }
+      else
+      {
+         node = new NodeRef(args.get("noderef"));
+      }
       
       // Work out what hash(es) they want
       // TODO
@@ -65,7 +78,7 @@ public class ChecksumCalculatorWebScript extends AbstractWebScript {
       writer.flush();
 
       // Have the calculation performed
-      // TODO
+      Map<String,String> hashes = calculator.getContentHashesHex(node, "TODO");
       
       // Return the information as JSON
       // TODO
