@@ -36,8 +36,9 @@ import org.apache.commons.codec.binary.Hex;
  * For calculating checksums of Alfresco contents
  */
 public class ChecksumCalculator {
-   protected static Collection<String> ALLOWED_HASH_ALGOS = 
+   protected static Collection<String> DEFAULT_HASH_ALGOS = 
          Arrays.asList(new String[] { "MD5", "SHA-1", "SHA-256", "SHA-512" });
+   protected Collection<String> ALLOWED_HASH_ALGOS = DEFAULT_HASH_ALGOS;
    
    private ContentService contentService;
    public void setContentService(ContentService contentService)
@@ -45,7 +46,11 @@ public class ChecksumCalculator {
       this.contentService = contentService;
    }
 
-   public static Collection<String> getAllowedHashAlgorithms()
+   protected static Collection<String> getDefaultHashAlgorithms()
+   {
+      return Collections.unmodifiableCollection(DEFAULT_HASH_ALGOS);
+   }
+   public Collection<String> getAllowedHashAlgorithms()
    {
       return Collections.unmodifiableCollection(ALLOWED_HASH_ALGOS);
    }
@@ -56,7 +61,7 @@ public class ChecksumCalculator {
       for (int i=0; i<hash.length; i++)
       {
          String h = hash[i];
-         if (! ALLOWED_HASH_ALGOS.contains(h))
+         if (! DEFAULT_HASH_ALGOS.contains(h))
          {
             throw new IllegalArgumentException("Unsupported hash '"+h+"'");
          }
