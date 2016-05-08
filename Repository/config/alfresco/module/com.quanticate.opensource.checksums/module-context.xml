@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+<beans>
+  <bean id="checksumCalculator" 
+        class="com.quanticate.opensource.checksums.calculator.ChecksumCalculator">
+    <propery name="contentService" ref="ContentService" />
+  </bean>
+  <alias name="ChecksumCalculator" ref="checksumCalculator" />
+
+  <!-- TODO Webscript -->
+</beans>
+

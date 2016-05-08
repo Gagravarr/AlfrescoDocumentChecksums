@@ -75,13 +75,13 @@ public class TestChecksumCalculatorCore
       
       try
       {
-         ChecksumCalculator.getHashes(null, "Invalid");
+         ChecksumCalculator.getHashes(new ByteArrayInputStream(TEST_BYTES), "Invalid");
          fail("Invalid not valid");
       } 
       catch (IllegalArgumentException e) {} 
       try
       {
-         ChecksumCalculator.getHashes(null, "MD5", "Invalid");
+         ChecksumCalculator.getHashes(new ByteArrayInputStream(TEST_BYTES), "MD5", "Invalid");
          fail("Invalid not valid");
       } 
       catch (IllegalArgumentException e) {} 

@@ -15,14 +15,25 @@
 ==================================================================== */
 package com.quanticate.opensource.checksums.calculator;
 
+import static com.quanticate.opensource.checksums.calculator.TestChecksumCalculatorCore.HASH_MD5;
+import static com.quanticate.opensource.checksums.calculator.TestChecksumCalculatorCore.HASH_SHA_1;
+import static com.quanticate.opensource.checksums.calculator.TestChecksumCalculatorCore.HASH_SHA_256;
+import static com.quanticate.opensource.checksums.calculator.TestChecksumCalculatorCore.HASH_SHA_512;
+import static com.quanticate.opensource.checksums.calculator.TestChecksumCalculatorCore.TEST_TEXT;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import java.util.Map;
+
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.model.Repository;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
-import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.util.test.junitrules.ApplicationContextInit;
 import org.alfresco.util.test.junitrules.TemporaryNodes;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * Alfresco-specific tests for {@link ChecksumCalculator} which
@@ -34,22 +45,77 @@ public class TestChecksumCalculatorAlfresco
    protected TemporaryNodes testNodes = new TemporaryNodes(APP_CONTEXT_INIT);
    protected NodeRef testContent;
    
-   private static ContentService contentService;
+   protected static ChecksumCalculator calculator;
    
-   @BeforeClass public static void initBasicServices() throws Exception
+   @BeforeClass public static void init()
    {
-      contentService = APP_CONTEXT_INIT.getApplicationContext().getBean("ContentService", ContentService.class); 
+      calculator = APP_CONTEXT_INIT.getApplicationContext().getBean("ChecksumCalculator", ChecksumCalculator.class);
    }
+   
    @Before public void createTestNode() throws Exception
    {
       AuthenticationUtil.setRunAsUserSystem();
 
       Repository repositoryHelper = APP_CONTEXT_INIT.getApplicationContext().getBean("repositoryHelper", Repository.class);
       NodeRef companyHome = repositoryHelper.getCompanyHome();
-      NodeRef checksumTest = testNodes.createFolder(companyHome, "Checksum Test", "System");
+      NodeRef checksumTest = testNodes.createFolder(companyHome, "Checksum Test", "Admin");
 
-      testContent = testNodes.createNodeWithTextContent(parentNode, nodeCmName, nodeType, nodeCreator, textContent)
+      testContent = testNodes.createNodeWithTextContent(checksumTest, "Test.txt", 
+                                      ContentModel.TYPE_CONTENT, "Admin", TEST_TEXT);
+   }
+      
+   @Test
+   public void testInvalidHashes()
+   {
+      try
+      {
+         calculator.getContentHashes(null, "MD5");
+         fail("Null not valid");
+      } 
+      catch (IllegalArgumentException e) {} 
+      try
+      {
+         calculator.getContentHashesHex(null, "MD5");
+         fail("Null not valid");
+      } 
+      catch (IllegalArgumentException e) {}
+      
+      try
+      {
+         calculator.getContentHashes(testContent, "Invalid");
+         fail("Invalid not valid");
+      } 
+      catch (IllegalArgumentException e) {} 
+      try
+      {
+         calculator.getContentHashes(testContent, "MD5", "Invalid");
+         fail("Invalid not valid");
+      } 
+      catch (IllegalArgumentException e) {} 
    }
    
-   // TODO Add remaining tests
+   @Test
+   public void testHexHashes()
+   {
+      Map<String,String> hashes;
+      
+      hashes = calculator.getContentHashesHex(testContent, "MD5");
+      assertEquals(1, hashes.size());
+      assertEquals(HASH_MD5, hashes.get("MD5"));
+      
+      hashes = calculator.getContentHashesHex(testContent, "MD5", "MD5");
+      assertEquals(1, hashes.size());
+      assertEquals(HASH_MD5, hashes.get("MD5"));
+      
+      hashes = calculator.getContentHashesHex(testContent, "MD5", "SHA-1");
+      assertEquals(2, hashes.size());
+      assertEquals(HASH_MD5, hashes.get("MD5"));
+      assertEquals(HASH_SHA_1, hashes.get("SHA-1"));
+      
+      hashes = calculator.getContentHashesHex(testContent, "SHA-512", "SHA-256", "SHA-1");
+      assertEquals(3, hashes.size());
+      assertEquals(HASH_SHA_1, hashes.get("SHA-1"));
+      assertEquals(HASH_SHA_256, hashes.get("SHA-256"));
+      assertEquals(HASH_SHA_512, hashes.get("SHA-512"));
+   }
 }
