@@ -15,10 +15,41 @@
 ==================================================================== */
 package com.quanticate.opensource.checksums.calculator;
 
+import org.alfresco.repo.model.Repository;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.util.test.junitrules.ApplicationContextInit;
+import org.alfresco.util.test.junitrules.TemporaryNodes;
+import org.junit.Before;
+import org.junit.BeforeClass;
+
 /**
  * Alfresco-specific tests for {@link ChecksumCalculator} which
  *  require a Repository
  */
-public class TestChecksumCalculatorAlfresco {
-   // TODO
+public class TestChecksumCalculatorAlfresco 
+{
+   private static final ApplicationContextInit APP_CONTEXT_INIT = new ApplicationContextInit();
+   protected TemporaryNodes testNodes = new TemporaryNodes(APP_CONTEXT_INIT);
+   protected NodeRef testContent;
+   
+   private static ContentService contentService;
+   
+   @BeforeClass public static void initBasicServices() throws Exception
+   {
+      contentService = APP_CONTEXT_INIT.getApplicationContext().getBean("ContentService", ContentService.class); 
+   }
+   @Before public void createTestNode() throws Exception
+   {
+      AuthenticationUtil.setRunAsUserSystem();
+
+      Repository repositoryHelper = APP_CONTEXT_INIT.getApplicationContext().getBean("repositoryHelper", Repository.class);
+      NodeRef companyHome = repositoryHelper.getCompanyHome();
+      NodeRef checksumTest = testNodes.createFolder(companyHome, "Checksum Test", "System");
+
+      testContent = testNodes.createNodeWithTextContent(parentNode, nodeCmName, nodeType, nodeCreator, textContent)
+   }
+   
+   // TODO Add remaining tests
 }
