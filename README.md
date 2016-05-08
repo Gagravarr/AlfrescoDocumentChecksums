@@ -13,10 +13,21 @@ http://blog.productivist.com/generate-checksums-for-alfresco-content/ and
 http://subversion.assembla.com/svn/seedhealth/trunk/health_behavior/src/au/gov/nehta/action/ChecksumActionExecutor.java
 but tries to be more general, and doesn't require pre-computation.
 
-TODO - Implement
-================
-This is an idea for the Alfresco Summit Barcelona 2013 Hackday, and has not
-yet been implemented...
+Share - TODO
+============
+Provide a page in Share to show the checksums
+
+WebScripts - TODO
+=================
+Finish and document the webscripts here
+
+Installation - TODO
+===================
+Package as two AMPs
+
+Building - TODO
+===============
+TODO Convert this to be buildable by the SDK
 
 License
 =======

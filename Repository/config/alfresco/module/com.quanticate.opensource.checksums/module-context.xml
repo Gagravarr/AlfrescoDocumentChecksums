@@ -3,9 +3,9 @@
 <beans>
   <bean id="checksumCalculator" 
         class="com.quanticate.opensource.checksums.calculator.ChecksumCalculator">
-    <propery name="contentService" ref="ContentService" />
+    <property name="contentService" ref="ContentService" />
   </bean>
-  <alias name="ChecksumCalculator" ref="checksumCalculator" />
+  <alias alias="ChecksumCalculator" name="checksumCalculator" />
 
   <!-- TODO Webscript -->
 </beans>
