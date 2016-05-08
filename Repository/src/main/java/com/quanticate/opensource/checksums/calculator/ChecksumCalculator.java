@@ -66,6 +66,10 @@ public class ChecksumCalculator {
             throw new IllegalArgumentException("Unsupported hash '"+h+"'");
          }
       }
+      if (data == null)
+      {
+         throw new IllegalArgumentException("Stream must be given to hash");
+      }
       
       int read = -1;
       byte[] buffer = new byte[8192];
