@@ -1,6 +1,18 @@
-*.class
+# Lines that start with '#' are comments.
 
-# Package Files #
+# Ignore class files
+*.class
+# Ignore vim swp files
+.*.swp
+
+# Everyone want's their own Eclipse setup
+.project
+.classpath
+
+# Package Files
 *.jar
 *.war
 *.ear
+/bin
+/build
+/target
