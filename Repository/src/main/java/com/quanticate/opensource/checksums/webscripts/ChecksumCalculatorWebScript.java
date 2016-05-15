@@ -16,24 +16,14 @@
 package com.quanticate.opensource.checksums.webscripts;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Writer;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.model.ContentModel;
-import org.alfresco.service.cmr.repository.ContentReader;
-import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.Charsets;
+import org.json.simple.JSONObject;
 import org.springframework.extensions.webscripts.AbstractWebScript;
+import org.springframework.extensions.webscripts.WebScriptException;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
 
@@ -67,9 +57,23 @@ public class ChecksumCalculatorWebScript extends AbstractWebScript {
       {
          node = new NodeRef(args.get("noderef"));
       }
+
       
       // Work out what hash(es) they want
-      // TODO
+      String[] hashAlgs;
+      if (req.getParameter("hash") != null)
+      {
+         hashAlgs = new String[] { req.getParameter("hash") };
+      }
+      else if (req.getParameter("hashes") != null)
+      {
+         hashAlgs = req.getParameter("hashes").split(",");
+      }
+      else
+      {
+         throw new WebScriptException("No hash or hashes given");
+      }
+
       
       // Start outputting, so the browser doesn't give up on us
       res.setContentType(WebScriptResponse.JSON_FORMAT);
@@ -77,10 +81,14 @@ public class ChecksumCalculatorWebScript extends AbstractWebScript {
       Writer writer = res.getWriter();
       writer.flush();
 
+      
       // Have the calculation performed
-      Map<String,String> hashes = calculator.getContentHashesHex(node, "TODO");
+      Map<String,String> hashes = calculator.getContentHashesHex(node, hashAlgs);
+      
       
       // Return the information as JSON
-      // TODO
+      String json = JSONObject.toJSONString(hashes);
+      writer.write(json);
+      writer.close();
    }
 }

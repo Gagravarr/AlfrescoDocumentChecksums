@@ -1,12 +1,21 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
 <beans>
+  <!-- Checksumming Bean -->
   <bean id="checksumCalculator" 
         class="com.quanticate.opensource.checksums.calculator.ChecksumCalculator">
     <property name="contentService" ref="ContentService" />
   </bean>
   <alias alias="ChecksumCalculator" name="checksumCalculator" />
 
-  <!-- TODO Webscript -->
+  <!-- Webscripts -->
+  <bean id="webscript.com.quanticate.opensource.checksums.checksum-hashes.get"
+        class="com.quanticate.opensource.checksums.webscripts.ChecksumHashesWebScript">
+    <property name="calculator" ref="ChecksumCalculator" />
+  </bean>
+  <bean id="webscript.com.quanticate.opensource.checksums.checksum-calculator.get"
+        class="com.quanticate.opensource.checksums.webscripts.ChecksumCalculatorWebScript">
+    <property name="calculator" ref="ChecksumCalculator" />
+  </bean>
 </beans>
 
