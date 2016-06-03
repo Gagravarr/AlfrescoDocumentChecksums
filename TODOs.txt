@@ -1,0 +1,8 @@
+ - Unit testing of the webscript
+ - Share page to display the checksums
+ - Share document details right-column component to display the checksums
+ - Share unit tests?
+ - Convert to using the new Maven SDK
+ - Build as AMPs
+ - Build as Alfresco 5.1+ style add-in Jars
+ - Screenshots
