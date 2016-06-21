@@ -27,6 +27,10 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
@@ -103,12 +107,24 @@ public class TestChecksumCalculatorWebScripts extends BaseWebScriptTest
       String url = "/com/quanitcate/opensource/checksums/hashes";
       Response resp = sendRequest(new GetRequest(url), Status.STATUS_OK);
 
-      // TODO Check
+      JSONObject json = (JSONObject)new JSONParser().parse(resp.getContentAsString());
+      assertNotNull(json);
+      assertTrue(json.containsKey("hashes"));
+      
+      JSONArray hashes = (JSONArray)json.get("hashes");
+      assertEquals(calculator.getAllowedHashAlgorithms().size(), hashes.size());
+      
+      for (int i=0; i<hashes.size(); i++)
+      {
+         String hash = (String)hashes.get(i);
+         assertEquals(true, calculator.getAllowedHashAlgorithms().contains(hash));
+      }
    }
    
    public void testGetInvalidHashes() throws Exception
    {
-      // TODO
+      // TODO Try for invalid nodes
+      // TODO Try for unsupported hashes
    }
    
    public void testGetHashes() throws Exception
