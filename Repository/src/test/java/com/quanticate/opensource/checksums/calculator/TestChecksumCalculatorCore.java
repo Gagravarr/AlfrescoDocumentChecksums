@@ -15,30 +15,27 @@
 ==================================================================== */
 package com.quanticate.opensource.checksums.calculator;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.Charsets;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-
 /**
  * Core (non-Alfresco) test for {@link ChecksumCalculator}
  */
 public class TestChecksumCalculatorCore 
 {
-   protected static final String TEST_TEXT = "The quick brown fox jumped over the lazy dog";
-   protected static final byte[] TEST_BYTES = TEST_TEXT.getBytes(Charsets.UTF_8);
-   protected static final String HASH_MD5 = "08a008a01d498c404b0c30852b39d3b8";
-   protected static final String HASH_SHA_1 = "f6513640f3045e9768b239785625caa6a2588842";
-   protected static final String HASH_SHA_256 = "7d38b5cd25a2baf85ad3bb5b9311383e671a8a142eb302b324d4a5fba8748c69";
-   protected static final String HASH_SHA_512 = "db25330cfa5d14eaadf11a6263371cfa0e70fcd7a63a433b91f2300ca25d45b66a7b50d2f6747995c8fa0ff365b28974792e7acd5624e1ddd0d66731f346f0e7";
+   public static final String TEST_TEXT = "The quick brown fox jumped over the lazy dog";
+   public static final byte[] TEST_BYTES = TEST_TEXT.getBytes(Charsets.UTF_8);
+   public static final String HASH_MD5 = "08a008a01d498c404b0c30852b39d3b8";
+   public static final String HASH_SHA_1 = "f6513640f3045e9768b239785625caa6a2588842";
+   public static final String HASH_SHA_256 = "7d38b5cd25a2baf85ad3bb5b9311383e671a8a142eb302b324d4a5fba8748c69";
+   public static final String HASH_SHA_512 = "db25330cfa5d14eaadf11a6263371cfa0e70fcd7a63a433b91f2300ca25d45b66a7b50d2f6747995c8fa0ff365b28974792e7acd5624e1ddd0d66731f346f0e7";
    
    @Test
    public void testAsHex()
