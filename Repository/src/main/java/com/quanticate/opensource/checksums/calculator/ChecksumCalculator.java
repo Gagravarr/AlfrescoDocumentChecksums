@@ -15,6 +15,7 @@
 ==================================================================== */
 package com.quanticate.opensource.checksums.calculator;
 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
@@ -35,6 +36,8 @@ import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * For calculating checksums of Alfresco contents
@@ -43,6 +46,8 @@ public class ChecksumCalculator {
    protected static Collection<String> DEFAULT_HASH_ALGOS = 
          Arrays.asList(new String[] { "MD5", "SHA-1", "SHA-256", "SHA-512" });
    protected Collection<String> ALLOWED_HASH_ALGOS = DEFAULT_HASH_ALGOS;
+   
+   private static Log logger = LogFactory.getLog(ChecksumCalculator.class);
    
    private NodeService nodeService;
    private ContentService contentService;
@@ -72,8 +77,7 @@ public class ChecksumCalculator {
             MessageDigest.getInstance(alg);
             validAlgs.add(alg);
          } catch (NoSuchAlgorithmException e) {
-            // TODO Probably better as logging...
-            System.err.println("Skipping unsupported hash '"+alg+"'");
+            logger.warn("Skipping unsupported hash '"+alg+"'");
          }
       }
       this.ALLOWED_HASH_ALGOS = validAlgs;
@@ -137,12 +141,14 @@ public class ChecksumCalculator {
    {
       if (! nodeService.exists(node))
       {
+         logger.info("Can't calculate hashes for non-existant node " + node);
          throw new InvalidNodeRefException(node);
       }
       
       ContentReader reader = contentService.getReader(node, ContentModel.PROP_CONTENT);
       if (reader == null)
       {
+         logger.info("Can't calculate hashes for node with no content " + node);
          throw new InvalidNodeRefException("No content on node", node);
       }
 
