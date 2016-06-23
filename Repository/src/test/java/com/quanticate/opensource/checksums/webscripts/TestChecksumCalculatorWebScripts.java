@@ -55,6 +55,9 @@ import com.quanticate.opensource.checksums.calculator.ChecksumCalculator;
  */
 public class TestChecksumCalculatorWebScripts extends BaseWebScriptTest
 {
+   protected static final String urlPrefixParts   = "/com/quanitcate/opensource/checksums/node/";
+   protected static final String urlPrefixNodeRef = "/com/quanitcate/opensource/checksums/node?nodeRef=";
+   
    private AuthenticationComponent authenticationComponent;
    private Repository repositoryHelper;
    private NodeService nodeService;
@@ -123,18 +126,42 @@ public class TestChecksumCalculatorWebScripts extends BaseWebScriptTest
    
    public void testGetInvalidHashes() throws Exception
    {
-      // TODO Try for invalid nodes
-      // TODO Try for unsupported hashes
+      String url;
+      Response resp;
+      
+      // Try for unsupported hashes
+      url = urlPrefixNodeRef + testNode.toString();
+      resp = sendRequest(new GetRequest(url), Status.STATUS_BAD_REQUEST);
+      assertContains("No hash or hashes given", resp.getContentAsString());
+      
+      url = urlPrefixNodeRef + testNode.toString() + "&hash=WRONG";
+//      resp = sendRequest(new GetRequest(url), Status.STATUS_BAD_REQUEST);
+      resp = sendRequest(new GetRequest(url), Status.STATUS_OK);
+System.err.println(resp.getContentAsString());
+      
+      // Try for invalid nodes
+      url = urlPrefixParts + "type/store/id?hashes=MD5";
+      resp = sendRequest(new GetRequest(url), Status.STATUS_NOT_FOUND);
+      url = urlPrefixNodeRef + "space://1234/567&hashes=MD5";
+      resp = sendRequest(new GetRequest(url), Status.STATUS_NOT_FOUND);
+      
    }
    
    public void testGetHashes() throws Exception
    {
-      String url1 = "/com/quanitcate/opensource/checksums/node/";
-      String url2 = "/com/quanitcate/opensource/checksums/noderef/";
+      String url;
+      Response resp;
       
       // Request one
-      // TODO
+      url = makePartsURL(testNode) + "?hash=MD5";
+      resp = sendRequest(new GetRequest(url), Status.STATUS_OK);
+System.err.println(resp.getContentAsString());
       
+      url = makeNodeRefURL(testNode) + "&hash=MD5";
+      resp = sendRequest(new GetRequest(url), Status.STATUS_OK);
+System.err.println(resp.getContentAsString());
+
+
       // Request several
       // TODO
       
@@ -144,5 +171,20 @@ public class TestChecksumCalculatorWebScripts extends BaseWebScriptTest
       assertEquals("", HASH_SHA_256);
       assertEquals("", HASH_SHA_512);
       }
+   }
+   
+   protected static String makePartsURL(NodeRef nodeRef)
+   {
+      return urlPrefixParts + nodeRef.getStoreRef().getProtocol() + "/" +
+                              nodeRef.getStoreRef().getIdentifier() + "/" +
+                              nodeRef.getId();
+   }
+   protected static String makeNodeRefURL(NodeRef nodeRef)
+   {
+      return urlPrefixNodeRef + nodeRef.toString();
+   }
+   public static void assertContains(String needle, String haystack)
+   {
+      assertTrue("'"+needle+"' not found in: " + haystack, haystack.contains(needle));
    }
 }

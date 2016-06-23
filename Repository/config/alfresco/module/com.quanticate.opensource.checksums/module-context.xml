@@ -4,6 +4,7 @@
   <!-- Checksumming Bean -->
   <bean id="checksumCalculator" 
         class="com.quanticate.opensource.checksums.calculator.ChecksumCalculator">
+    <property name="nodeService" ref="NodeService" />
     <property name="contentService" ref="ContentService" />
   </bean>
   <alias alias="ChecksumCalculator" name="checksumCalculator" />

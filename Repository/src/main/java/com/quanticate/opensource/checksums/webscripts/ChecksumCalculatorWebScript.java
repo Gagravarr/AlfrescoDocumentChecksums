@@ -19,10 +19,12 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.apache.commons.io.Charsets;
 import org.json.simple.JSONObject;
 import org.springframework.extensions.webscripts.AbstractWebScript;
+import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.WebScriptException;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
@@ -45,7 +47,7 @@ public class ChecksumCalculatorWebScript extends AbstractWebScript {
       // Work out what Node they want
       NodeRef node;
       Map<String,String> args = req.getServiceMatch().getTemplateVars();
-      if(args.get("store_type") != null)
+      if (args.get("store_type") != null)
       {
          node = new NodeRef(
                args.get("store_type"),
@@ -53,9 +55,13 @@ public class ChecksumCalculatorWebScript extends AbstractWebScript {
                args.get("id")
          );
       }
+      else if (req.getParameter("nodeRef") != null)
+      {
+         node = new NodeRef(req.getParameter("nodeRef"));
+      }
       else
       {
-         node = new NodeRef(args.get("noderef"));
+         throw new WebScriptException(Status.STATUS_BAD_REQUEST, "No NodeRef given");
       }
 
       
@@ -71,7 +77,7 @@ public class ChecksumCalculatorWebScript extends AbstractWebScript {
       }
       else
       {
-         throw new WebScriptException("No hash or hashes given");
+         throw new WebScriptException(Status.STATUS_BAD_REQUEST, "No hash or hashes given");
       }
 
       
@@ -83,7 +89,18 @@ public class ChecksumCalculatorWebScript extends AbstractWebScript {
 
       
       // Have the calculation performed
-      Map<String,String> hashes = calculator.getContentHashesHex(node, hashAlgs);
+      Map<String,String> hashes;
+      try {
+         hashes = calculator.getContentHashesHex(node, hashAlgs);
+      }
+      catch (InvalidNodeRefException e)
+      {
+         throw new WebScriptException(Status.STATUS_NOT_FOUND, node.toString());
+      }
+      catch (IllegalArgumentException ie)
+      {
+         throw new WebScriptException(Status.STATUS_BAD_REQUEST, ie.getMessage());
+      }
       
       
       // Return the information as JSON

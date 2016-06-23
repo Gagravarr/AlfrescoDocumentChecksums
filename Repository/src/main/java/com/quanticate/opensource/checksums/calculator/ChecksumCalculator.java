@@ -29,7 +29,9 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.apache.commons.codec.binary.Hex;
 
 /**
@@ -40,7 +42,12 @@ public class ChecksumCalculator {
          Arrays.asList(new String[] { "MD5", "SHA-1", "SHA-256", "SHA-512" });
    protected Collection<String> ALLOWED_HASH_ALGOS = DEFAULT_HASH_ALGOS;
    
+   private NodeService nodeService;
    private ContentService contentService;
+   public void setNodeService(NodeService nodeService)
+   {
+      this.nodeService = nodeService;
+   }
    public void setContentService(ContentService contentService)
    {
       this.contentService = contentService;
@@ -111,6 +118,11 @@ public class ChecksumCalculator {
    
    public Map<String,byte[]> getContentHashes(NodeRef node, String...hash)
    {
+      if (! nodeService.exists(node))
+      {
+         throw new InvalidNodeRefException(node);
+      }
+      
       ContentReader reader = contentService.getReader(node, ContentModel.PROP_CONTENT);
       if (reader == null) return Collections.emptyMap();
 
