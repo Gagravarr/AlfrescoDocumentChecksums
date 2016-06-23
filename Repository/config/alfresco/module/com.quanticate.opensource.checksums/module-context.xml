@@ -6,6 +6,15 @@
         class="com.quanticate.opensource.checksums.calculator.ChecksumCalculator">
     <property name="nodeService" ref="NodeService" />
     <property name="contentService" ref="ContentService" />
+    <!-- Uncomment to restrict to just fast-but-maybe-spoofable -->
+<!--
+    <property name="allowedHashAlgorithms">
+      <list>
+        <value>MD5</value>
+        <value>SHA-1</value>
+      </list>
+    </property>
+-->
   </bean>
   <alias alias="ChecksumCalculator" name="checksumCalculator" />
 

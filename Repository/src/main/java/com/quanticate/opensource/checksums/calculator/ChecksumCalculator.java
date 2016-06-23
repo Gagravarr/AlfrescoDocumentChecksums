@@ -19,10 +19,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.alfresco.error.AlfrescoRuntimeException;
@@ -60,6 +62,21 @@ public class ChecksumCalculator {
    public Collection<String> getAllowedHashAlgorithms()
    {
       return Collections.unmodifiableCollection(ALLOWED_HASH_ALGOS);
+   }
+   public void setAllowedHashAlgorithms(List<String> algs)
+   {
+      Collection<String> validAlgs = new ArrayList<>();
+      for (String alg : algs)
+      {
+         try {
+            MessageDigest.getInstance(alg);
+            validAlgs.add(alg);
+         } catch (NoSuchAlgorithmException e) {
+            // TODO Probably better as logging...
+            System.err.println("Skipping unsupported hash '"+alg+"'");
+         }
+      }
+      this.ALLOWED_HASH_ALGOS = validAlgs;
    }
    
    public static Map<String,byte[]> getHashes(InputStream data, String...hash)

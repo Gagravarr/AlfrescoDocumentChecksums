@@ -1,5 +1,5 @@
- - Unit testing of the webscript
  - Share page to display the checksums
+ - Share caching of allowed hash algos
  - Share document details right-column component to display the checksums
  - Share unit tests?
  - Convert to using the new Maven SDK
