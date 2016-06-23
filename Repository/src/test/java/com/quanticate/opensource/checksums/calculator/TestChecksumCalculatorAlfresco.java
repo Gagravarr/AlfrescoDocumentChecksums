@@ -29,6 +29,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.model.Repository;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.util.GUID;
 import org.alfresco.util.test.junitrules.ApplicationContextInit;
 import org.alfresco.util.test.junitrules.TemporaryNodes;
 import org.junit.Before;
@@ -58,7 +59,8 @@ public class TestChecksumCalculatorAlfresco
 
       Repository repositoryHelper = APP_CONTEXT_INIT.getApplicationContext().getBean("repositoryHelper", Repository.class);
       NodeRef companyHome = repositoryHelper.getCompanyHome();
-      NodeRef checksumTest = testNodes.createFolder(companyHome, "Checksum Test", "Admin");
+      String testNodeName = "Checksum Test " + GUID.generate();
+      NodeRef checksumTest = testNodes.createFolder(companyHome, testNodeName, "Admin");
 
       testContent = testNodes.createNodeWithTextContent(checksumTest, "Test.txt", 
                                       ContentModel.TYPE_CONTENT, "Admin", TEST_TEXT);
