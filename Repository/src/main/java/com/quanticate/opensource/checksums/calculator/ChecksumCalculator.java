@@ -124,7 +124,10 @@ public class ChecksumCalculator {
       }
       
       ContentReader reader = contentService.getReader(node, ContentModel.PROP_CONTENT);
-      if (reader == null) return Collections.emptyMap();
+      if (reader == null)
+      {
+         throw new InvalidNodeRefException("No content on node", node);
+      }
 
       try
       {

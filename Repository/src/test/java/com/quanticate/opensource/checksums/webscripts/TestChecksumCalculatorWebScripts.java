@@ -27,12 +27,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-
-import javax.transaction.UserTransaction;
-
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.model.Repository;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
@@ -41,8 +35,10 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.GUID;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.springframework.context.ApplicationContext;
 import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.TestWebScriptServer.GetRequest;
@@ -62,10 +58,9 @@ public class TestChecksumCalculatorWebScripts extends BaseWebScriptTest
    private Repository repositoryHelper;
    private NodeService nodeService;
    private ContentService contentService;
-   private TransactionService transactionService;
    private NodeRef companyHome;
+   private NodeRef testFolder;
    private NodeRef testNode;
-   private UserTransaction txn;
    private ChecksumCalculator calculator;
 
    @Override
@@ -78,13 +73,9 @@ public class TestChecksumCalculatorWebScripts extends BaseWebScriptTest
        this.repositoryHelper = ctx.getBean("repositoryHelper", Repository.class);
        this.nodeService = ctx.getBean("NodeService", NodeService.class);
        this.contentService = ctx.getBean("ContentService", ContentService.class);
-       this.transactionService = ctx.getBean("TransactionService", TransactionService.class);
        this.calculator = ctx.getBean("ChecksumCalculator", ChecksumCalculator.class);
 
        this.authenticationComponent.setSystemUserAsCurrentUser();
-
-       txn = transactionService.getUserTransaction();
-       txn.begin();
 
        companyHome = this.repositoryHelper.getCompanyHome();
        
@@ -92,17 +83,19 @@ public class TestChecksumCalculatorWebScripts extends BaseWebScriptTest
        String name = "HashesTest" + GUID.generate();
        Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
        props.put(ContentModel.PROP_NAME, name);
-       testNode = nodeService.createNode(companyHome, ContentModel.ASSOC_CHILDREN, QName.createQName(name), ContentModel.TYPE_CONTENT, props).getChildRef();
+       testFolder = nodeService.createNode(companyHome, ContentModel.ASSOC_CONTAINS, QName.createQName(name), ContentModel.TYPE_FOLDER, props).getChildRef();
+       testNode = nodeService.createNode(testFolder, ContentModel.ASSOC_CONTAINS, QName.createQName(name), ContentModel.TYPE_CONTENT, props).getChildRef();
        
        // Put the test data in it
        InputStream is = new ByteArrayInputStream(TEST_BYTES);
-       contentService.getWriter(testNode, ContentModel.PROP_CONTENT, false).putContent(is);
+       contentService.getWriter(testNode, ContentModel.PROP_CONTENT, true).putContent(is);
    }
 
    @Override
    protected void tearDown() throws Exception
    {
-       txn.rollback();
+      this.authenticationComponent.setSystemUserAsCurrentUser();
+      this.nodeService.deleteNode(testFolder);
    }
    
    public void testGetAllowedHashes() throws Exception
@@ -135,13 +128,13 @@ public class TestChecksumCalculatorWebScripts extends BaseWebScriptTest
       assertContains("No hash or hashes given", resp.getContentAsString());
       
       url = urlPrefixNodeRef + testNode.toString() + "&hash=WRONG";
-//      resp = sendRequest(new GetRequest(url), Status.STATUS_BAD_REQUEST);
-      resp = sendRequest(new GetRequest(url), Status.STATUS_OK);
-System.err.println(resp.getContentAsString());
+      resp = sendRequest(new GetRequest(url), Status.STATUS_BAD_REQUEST);
+      assertContains("Unsupported hash", resp.getContentAsString());
       
       // Try for invalid nodes
       url = urlPrefixParts + "type/store/id?hashes=MD5";
       resp = sendRequest(new GetRequest(url), Status.STATUS_NOT_FOUND);
+
       url = urlPrefixNodeRef + "space://1234/567&hashes=MD5";
       resp = sendRequest(new GetRequest(url), Status.STATUS_NOT_FOUND);
       
@@ -151,26 +144,38 @@ System.err.println(resp.getContentAsString());
    {
       String url;
       Response resp;
+      JSONObject json;
       
       // Request one
       url = makePartsURL(testNode) + "?hash=MD5";
       resp = sendRequest(new GetRequest(url), Status.STATUS_OK);
-System.err.println(resp.getContentAsString());
-      
+      json = (JSONObject)new JSONParser().parse(resp.getContentAsString());
+      assertEquals(HASH_MD5, json.get("MD5"));
+      assertEquals(1, json.size());
+ 
       url = makeNodeRefURL(testNode) + "&hash=MD5";
       resp = sendRequest(new GetRequest(url), Status.STATUS_OK);
-System.err.println(resp.getContentAsString());
+      json = (JSONObject)new JSONParser().parse(resp.getContentAsString());
+      assertEquals(HASH_MD5, json.get("MD5"));
+      assertEquals(1, json.size());
 
 
       // Request several
-      // TODO
+      url = makePartsURL(testNode) + "?hashes=MD5,SHA-1";
+      resp = sendRequest(new GetRequest(url), Status.STATUS_OK);
+      json = (JSONObject)new JSONParser().parse(resp.getContentAsString());
+      assertEquals(HASH_MD5, json.get("MD5"));
+      assertEquals(HASH_SHA_1, json.get("SHA-1"));
+      assertEquals(2, json.size());
       
-      if(1==0){
-      assertEquals("", HASH_MD5);
-      assertEquals("", HASH_SHA_1);
-      assertEquals("", HASH_SHA_256);
-      assertEquals("", HASH_SHA_512);
-      }
+      // Request with duplicates
+      url = makeNodeRefURL(testNode) + "&hashes=SHA-1,SHA-1,SHA-256,SHA-512";
+      resp = sendRequest(new GetRequest(url), Status.STATUS_OK);
+      json = (JSONObject)new JSONParser().parse(resp.getContentAsString());
+      assertEquals(HASH_SHA_1, json.get("SHA-1"));
+      assertEquals(HASH_SHA_256, json.get("SHA-256"));
+      assertEquals(HASH_SHA_512, json.get("SHA-512"));
+      assertEquals(3, json.size());
    }
    
    protected static String makePartsURL(NodeRef nodeRef)
