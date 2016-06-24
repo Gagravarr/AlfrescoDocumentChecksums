@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>document-checksums</shortname>
+  <description>Document Checksums</description>
+  <url>/components/document-details/document-checksums</url>
+</webscript>

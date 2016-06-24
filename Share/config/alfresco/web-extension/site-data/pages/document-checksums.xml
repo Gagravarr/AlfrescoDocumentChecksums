@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<page>
+   <title>Document Checksums</title>
+   <title-id>Document-Checksums</title-id>
+   <description>Page to show Checksums for a Document</description>
+   <description-id></description-id>
+   <template-instance>document-checksums</template-instance>
+   <authentication>user</authentication>
+</page>

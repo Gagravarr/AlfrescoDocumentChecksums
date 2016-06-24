@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<template-instance>
+   <template-type>com/quanticate/opensource/document-checksums</template-type>
+   <components>
+      <!-- Title-->
+      <component>
+         <region-id>title</region-id>
+         <sub-components>
+            <sub-component id="default">
+               <url>/components/title/collaboration-title</url>
+            </sub-component>
+         </sub-components>
+         </component>
+
+      <!-- Navigation-->
+      <component>
+         <region-id>navigation</region-id>
+         <sub-components>
+            <sub-component id="default">
+               <url>/components/navigation/collaboration-navigation</url>
+            </sub-component>
+         </sub-components>
+      </component>
+
+      <component>
+         <region-id>document-checksums</region-id>
+         <url>/components/document-details/document-checksums</url>
+      </component>
+   </components>
+</template-instance>
