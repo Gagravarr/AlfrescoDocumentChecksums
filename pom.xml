@@ -19,9 +19,7 @@
 
     <modules>
       <module>Repository</module>
-<!--
       <module>Share</module>
--->
     </modules>
 
     <!-- 
