@@ -4,6 +4,8 @@
 *.class
 # Ignore vim swp files
 .*.swp
+# Ignore repo log files
+alfresco*.log*
 
 # Everyone want's their own Eclipse setup
 .project
@@ -16,3 +18,5 @@
 /bin
 /build
 /target
+*/build
+*/target
