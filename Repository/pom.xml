@@ -52,11 +52,18 @@
             <artifactId>alfresco-repository</artifactId>
             <version>${alfresco.version}</version>
         </dependency>
+
         <dependency>
             <groupId>${alfresco.groupId}</groupId>
             <artifactId>alfresco-repository</artifactId>
             <version>${alfresco.version}</version>
             <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${alfresco.groupId}</groupId>
+            <artifactId>alfresco-remote-api</artifactId>
+            <version>${alfresco.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
