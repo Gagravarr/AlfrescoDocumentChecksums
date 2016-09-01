@@ -5,4 +5,5 @@
  - Convert to using the new Maven SDK
  - Build as AMPs
  - Build as Alfresco 5.1+ style add-in Jars
+ - Support pre-calculating
  - Screenshots
